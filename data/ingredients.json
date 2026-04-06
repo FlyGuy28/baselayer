@@ -1,0 +1,42 @@
+{
+  "glycerin": {
+    "score": 1,
+    "description": "A natural humectant that pulls moisture into the skin. Excellent for dehydration.",
+    "isFungalAcneSafe": true
+  },
+  "polysorbate 20": {
+    "score": 3,
+    "description": "An emulsifier that can feed Malassezia yeast.",
+    "isFungalAcneSafe": false
+  },
+  "isopropyl myristate": {
+    "score": 1,
+    "description": "An ester often used as an emollient. Highly triggering for fungal acne.",
+    "isFungalAcneSafe": false
+  },
+  "hyaluronic acid": {
+    "score": 1,
+    "description": "A powerful moisture-binding ingredient. Essential for dehydrated skin.",
+    "isFungalAcneSafe": true
+  },
+  "alcohol denat": {
+    "score": 4,
+    "description": "Drying alcohol that can compromise the skin barrier and worsen dehydration.",
+    "isFungalAcneSafe": true
+  },
+  "ceramide np": {
+    "score": 1,
+    "description": "A lipid that helps restore the skin barrier. Very safe and helpful.",
+    "isFungalAcneSafe": true
+  },
+  "niacinamide": {
+    "score": 1,
+    "description": "Vitamin B3. Helps with skin barrier and oil control.",
+    "isFungalAcneSafe": true
+  },
+  "fragrance": {
+    "score": 8,
+    "description": "A common irritant and allergen. High hazard score due to lack of transparency.",
+    "isFungalAcneSafe": true
+  }
+}
