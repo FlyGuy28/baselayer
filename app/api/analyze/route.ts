@@ -7,55 +7,55 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  const { product, ingredients: manualIngredients, profile } = await req.json();
-
+  const { product, ingredients, profile, isManual } = await req.json();
   let rawIngredients = "";
-  let productName = product || "New Product";
+  let productName = product;
 
-  // 1. Manual/OCR Entry -> Save to Database
-  if (manualIngredients) {
-    rawIngredients = manualIngredients;
-    
-    // If they provided a real name, insert it into Supabase!
-    if (productName !== "Manual Entry" && productName.trim() !== "") {
-      const { error } = await supabase
-        .from('product_master')
-        .insert([{ product_name: productName, ingredients: rawIngredients }]);
-      
-      if (error) console.error("Failed to add to DB:", error);
+  if (isManual && ingredients) {
+    // COMMUNITY CONSENSUS LOGIC
+    const { data: existing } = await supabase
+      .from('product_master')
+      .select('*')
+      .ilike('product_name', product)
+      .single();
+
+    if (existing) {
+      if (existing.verification_count < 3) {
+        await supabase.from('product_master')
+          .update({ verification_count: existing.verification_count + 1 })
+          .eq('id', existing.id);
+      }
+      rawIngredients = existing.ingredients;
+    } else {
+      // First submission
+      await supabase.from('product_master').insert([
+        { product_name: product, ingredients, verification_count: 1 }
+      ]);
+      rawIngredients = ingredients;
     }
   } else {
-    // 2. Standard Database Search
     const { data, error } = await supabase
       .from('product_master')
       .select('*')
       .ilike('product_name', `%${product}%`)
-      .limit(1)
+      .eq('is_verified', true) // Only show verified items in general search
       .single();
 
-    if (error || !data) return Response.json({ status: 'not_found', message: 'Not found' });
+    if (error || !data) return Response.json({ status: 'not_found' });
     rawIngredients = data.ingredients;
     productName = data.product_name;
   }
 
-  // 3. Scoring Logic
+  // SCORING
   let score = 100;
-  const warnings: any[] = [];
-  const heroes: any[] = [];
+  const warnings = INGREDIENT_RULES.warnings.filter(rule => 
+    profile[rule.flag] && rule.keywords.some(k => rawIngredients.toLowerCase().includes(k.toLowerCase()))
+  );
+  const heroes = INGREDIENT_RULES.heroes.filter(rule => 
+    profile[rule.flag] && rule.keywords.some(k => rawIngredients.toLowerCase().includes(k.toLowerCase()))
+  );
 
-  INGREDIENT_RULES.warnings.forEach(rule => {
-    if (profile[rule.flag] && rule.keywords.some(k => rawIngredients.toLowerCase().includes(k.toLowerCase()))) {
-      warnings.push(rule);
-      score -= 15;
-    }
-  });
-
-  INGREDIENT_RULES.heroes.forEach(rule => {
-    if (profile[rule.flag] && rule.keywords.some(k => rawIngredients.toLowerCase().includes(k.toLowerCase()))) {
-      heroes.push(rule);
-      score += 10;
-    }
-  });
+  score = score - (warnings.length * 15) + (heroes.length * 10);
 
   return Response.json({
     status: 'success',
