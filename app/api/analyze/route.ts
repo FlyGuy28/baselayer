@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { INGREDIENT_RULES } from '@/lib/ingredientRules';
 
+console.log("DEBUG ENV:", process.env.NEXT_PUBLIC_SUPABASE_URL ? "URL EXISTS" : "URL MISSING");
+
 // Initialize Supabase admin client
 // Using the service role key to bypass RLS policies for simple server-side data reading
 const supabase = createClient(

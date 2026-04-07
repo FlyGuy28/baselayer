@@ -132,8 +132,8 @@ export default function BaseLayer() {
                   <div className={`text-6xl font-black ${result.score > 75 ? 'text-green-500' : result.score > 50 ? 'text-amber-500' : 'text-red-500'}`}>
                     {result.score}%
                   </div>
-                  <div className="h-12 w-[2px] bg-slate-100" />
-                  <p className="text-slate-600 font-medium max-w-[200px]">
+                  <div className="h-12 w-0.5 bg-slate-100" />
+                  <p className="text-slate-600 font-medium max-w-50">
                     {result.score > 75 ? "Excellent match for your profile!" : result.score > 50 ? "Use with caution." : "Not recommended for your skin."}
                   </p>
                 </div>
