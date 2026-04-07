@@ -24,7 +24,7 @@ export async function POST(req: Request) {
         await supabase.from('product_master')
           .update({ 
             verification_count: existing.verification_count + 1,
-            barcode: barcode || existing.barcode // update barcode if provided
+            barcode: barcode || existing.barcode 
           })
           .eq('id', existing.id);
       }
@@ -44,9 +44,8 @@ export async function POST(req: Request) {
       rawIngredients = ingredients;
     }
   } else {
-    // Normal Search (By Name or Barcode)
+    // Normal Search Logic
     let query = supabase.from('product_master').select('*');
-    
     if (barcode) {
       query = query.eq('barcode', barcode);
     } else {
@@ -54,13 +53,12 @@ export async function POST(req: Request) {
     }
 
     const { data, error } = await query.limit(1).single();
-
     if (error || !data) return Response.json({ status: 'not_found' });
     rawIngredients = data.ingredients;
     finalProductName = data.product_name;
   }
 
-  // SCORING
+  // SCORING ENGINE
   let score = 100;
   const warnings = INGREDIENT_RULES.warnings.filter(rule => 
     profile[rule.flag] && rule.keywords.some(k => rawIngredients.toLowerCase().includes(k.toLowerCase()))
