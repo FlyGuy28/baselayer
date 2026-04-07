@@ -7,9 +7,9 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  const { product, ingredients, profile, isManual } = await req.json();
+  const { product, barcode, ingredients, profile, isManual } = await req.json();
   let rawIngredients = "";
-  let productName = product;
+  let finalProductName = product;
 
   if (isManual && ingredients) {
     // COMMUNITY CONSENSUS LOGIC
@@ -22,28 +22,42 @@ export async function POST(req: Request) {
     if (existing) {
       if (existing.verification_count < 3) {
         await supabase.from('product_master')
-          .update({ verification_count: existing.verification_count + 1 })
+          .update({ 
+            verification_count: existing.verification_count + 1,
+            barcode: barcode || existing.barcode // update barcode if provided
+          })
           .eq('id', existing.id);
       }
       rawIngredients = existing.ingredients;
+      finalProductName = existing.product_name;
     } else {
       // First submission
       await supabase.from('product_master').insert([
-        { product_name: product, ingredients, verification_count: 1 }
+        { 
+          product_name: product || "Unknown Product", 
+          barcode: barcode || null,
+          ingredients: ingredients, 
+          verification_count: 1,
+          is_verified: false
+        }
       ]);
       rawIngredients = ingredients;
     }
   } else {
-    const { data, error } = await supabase
-      .from('product_master')
-      .select('*')
-      .ilike('product_name', `%${product}%`)
-      .eq('is_verified', true) // Only show verified items in general search
-      .single();
+    // Normal Search (By Name or Barcode)
+    let query = supabase.from('product_master').select('*');
+    
+    if (barcode) {
+      query = query.eq('barcode', barcode);
+    } else {
+      query = query.ilike('product_name', `%${product}%`);
+    }
+
+    const { data, error } = await query.limit(1).single();
 
     if (error || !data) return Response.json({ status: 'not_found' });
     rawIngredients = data.ingredients;
-    productName = data.product_name;
+    finalProductName = data.product_name;
   }
 
   // SCORING
@@ -59,7 +73,7 @@ export async function POST(req: Request) {
 
   return Response.json({
     status: 'success',
-    product: productName,
+    product: finalProductName,
     score: Math.min(Math.max(score, 0), 100),
     warnings,
     heroes
