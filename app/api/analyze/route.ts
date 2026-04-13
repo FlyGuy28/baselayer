@@ -1,10 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import { INGREDIENT_RULES } from '@/lib/ingredientRules';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { fetchFromOBF } from '@/lib/obf';
 
 export async function POST(req: Request) {
   const { product, barcode, ingredients, profile, isManual } = await req.json();
@@ -53,9 +49,29 @@ export async function POST(req: Request) {
     }
 
     const { data, error } = await query.limit(1).single();
-    if (error || !data) return Response.json({ status: 'not_found' });
-    rawIngredients = data.ingredients;
-    finalProductName = data.product_name;
+    
+    if (error || !data) {
+      // Try Open Beauty Facts as fallback
+      const obfData = barcode ? await fetchFromOBF(barcode) : null;
+      
+      if (obfData && obfData.ingredients) {
+        // Save to database for future use
+        await supabase.from('product_master').insert({
+          product_name: obfData.name,
+          ingredients: obfData.ingredients,
+          barcode: barcode || null,
+          verification_count: 5,
+          is_verified: true
+        });
+        rawIngredients = obfData.ingredients;
+        finalProductName = obfData.name;
+      } else {
+        return Response.json({ status: 'not_found' });
+      }
+    } else {
+      rawIngredients = data.ingredients;
+      finalProductName = data.product_name;
+    }
   }
 
   // SCORING ENGINE

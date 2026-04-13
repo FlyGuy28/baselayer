@@ -7,6 +7,8 @@ import {
   Droplets, Wind, Camera, Barcode, ListChecks, Settings2, 
   Moon, Sun, Coffee, Sunset, Plus, Bath, ScanLine
 } from 'lucide-react';
+import ScannerComponent from '@/components/ScannerComponent';
+import BarcodeScanner from '@/components/BarcodeScanner';
 
 const PROFILE_ATTRIBUTES = [
   { label: 'Skin Type', keys: ['isOily', 'isDry', 'isCombination', 'isNormal', 'isDehydrated'] },
@@ -33,6 +35,8 @@ export default function BaseLayer() {
 
   const ocrInputRef = useRef<HTMLInputElement>(null);
   const barcodeInputRef = useRef<HTMLInputElement>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
 
   // --- THEME & PERSISTENCE ENGINE ---
   useEffect(() => {
@@ -74,6 +78,19 @@ export default function BaseLayer() {
     setOcrStatus("");
   };
 
+  const handleCameraScan = (text: string) => {
+    setIsManualMode(true);
+    const index = text.toUpperCase().indexOf("INGREDIENTS");
+    const filtered = index !== -1 ? text.substring(index + 11) : text;
+    setManualIngredients(filtered.trim());
+    setShowScanner(false);
+  };
+
+  const handleBarcodeScan = (code: string) => {
+    setNewBarcode(code);
+    setShowBarcodeScanner(false);
+  };
+
   // --- SEARCH & ANALYZE ---
   const handleAnalyze = async (isManual = false) => {
     setIsLoading(true);
@@ -107,6 +124,10 @@ export default function BaseLayer() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0f1115] text-slate-900 dark:text-white transition-colors duration-300 pb-32 font-sans">
+      
+      {/* --- SCANNER COMPONENTS --- */}
+      {showScanner && <ScannerComponent onScanComplete={handleCameraScan} onClose={() => setShowScanner(false)} />}
+      {showBarcodeScanner && <BarcodeScanner onScan={handleBarcodeScan} onClose={() => setShowBarcodeScanner(false)} />}
       
       {/* --- STANDALONE SURVEY --- */}
       {showSurvey && (
@@ -156,8 +177,8 @@ export default function BaseLayer() {
             )}
 
             <div className="flex gap-4 justify-center">
-              <button onClick={() => ocrInputRef.current?.click()} className="flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#1a1d23] rounded-full text-xs font-black border border-slate-100 dark:border-white/5 shadow-xl"><Camera size={18} className="text-blue-600"/> SCAN LABEL</button>
-              <button onClick={() => {alert("No barcode database connected. Opening manual entry."); setIsManualMode(true)}} className="flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#1a1d23] rounded-full text-xs font-black border border-slate-100 dark:border-white/5 shadow-xl"><Barcode size={18} className="text-slate-400"/> BARCODE</button>
+              <button onClick={() => setShowScanner(true)} className="flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#1a1d23] rounded-full text-xs font-black border border-slate-100 dark:border-white/5 shadow-xl"><Camera size={18} className="text-blue-600"/> SCAN LABEL</button>
+              <button onClick={() => setShowBarcodeScanner(true)} className="flex items-center gap-3 px-8 py-4 bg-white dark:bg-[#1a1d23] rounded-full text-xs font-black border border-slate-100 dark:border-white/5 shadow-xl"><Barcode size={18} className="text-slate-400"/> BARCODE</button>
             </div>
 
             {/* --- RESULTS DISPLAY --- */}
