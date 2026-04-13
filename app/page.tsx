@@ -133,16 +133,16 @@ export default function BaseLayer() {
       {showSurvey && (
         <div className="fixed inset-0 z-100 bg-white dark:bg-[#0f1115] p-8 flex flex-col justify-center animate-in fade-in">
           <div className="max-w-md mx-auto w-full">
-            <h1 className="text-4xl font-black mb-4 italic tracking-tighter">BASELAYER SETUP</h1>
-            <p className="text-slate-500 mb-8 font-medium">Select your primary skin or hair concerns to calibrate the AI.</p>
+            <h1 className="text-4xl font-black mb-4 italic tracking-tighter">BASE<span className="text-blue-600">LAYER</span> SETUP</h1>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">Select your primary skin or hair concerns to calibrate the AI.</p>
             <div className="grid grid-cols-2 gap-3 mb-10">
               {PROFILE_ATTRIBUTES.flatMap(g => g.keys).slice(0, 8).map(key => (
-                <button key={key} onClick={() => toggleOption(key)} className={`p-4 rounded-2xl border-2 font-bold text-xs transition-all ${profile[key] ? 'border-blue-600 bg-blue-600 text-white shadow-lg' : 'border-slate-100 text-slate-400'}`}>
+                <button key={key} onClick={() => toggleOption(key)} className={`p-4 rounded-2xl border-2 font-bold text-xs transition-all ${profile[key] ? 'border-blue-600 bg-blue-600 text-white shadow-lg' : 'border-slate-100 dark:border-white/5 text-slate-400 dark:text-slate-500'}`}>
                   {key.replace('is', '').replace(/([A-Z])/g, ' $1')}
                 </button>
               ))}
             </div>
-            <button onClick={() => setShowSurvey(false)} className="w-full py-5 bg-blue-600 text-white rounded-3xl font-black text-lg">COMPLETE PROFILE</button>
+            <button onClick={() => setShowSurvey(false)} className="w-full py-5 bg-blue-600 text-white rounded-3xl font-black text-lg shadow-xl shadow-blue-600/20">COMPLETE PROFILE</button>
           </div>
         </div>
       )}
