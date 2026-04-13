@@ -9,9 +9,9 @@ import {
 } from 'lucide-react';
 
 const PROFILE_ATTRIBUTES = [
-  { label: 'Skin Type', keys: ['isOily', 'isDry', 'isCombination', 'isNormal'] },
-  { label: 'Skin Concerns', keys: ['isSensitive', 'isAcneProne', 'isFungalAcne', 'isRosacea', 'isEczema', 'isAging'] },
-  { label: 'Hair & Body', keys: ['isThinning', 'isDandruff', 'isDamaged', 'isFrizz', 'isDryBody'] }
+  { label: 'Skin Type', keys: ['isOily', 'isDry', 'isCombination', 'isNormal', 'isDehydrated'] },
+  { label: 'Skin Concerns', keys: ['isSensitive', 'isAcneProne', 'isFungalAcne', 'isRosacea', 'isEczema', 'isAging', 'isFineLines', 'isHyperpigmentation', 'isUnevenTexture', 'isPoreCongested'] },
+  { label: 'Hair & Body', keys: ['isThinning', 'isDandruff', 'isDamaged', 'isFrizz', 'isDryBody', 'isDryHair', 'isOilyScalp'] }
 ];
 
 export default function BaseLayer() {
@@ -110,7 +110,7 @@ export default function BaseLayer() {
       
       {/* --- STANDALONE SURVEY --- */}
       {showSurvey && (
-        <div className="fixed inset-0 z-[100] bg-white dark:bg-[#0f1115] p-8 flex flex-col justify-center animate-in fade-in">
+        <div className="fixed inset-0 z-100 bg-white dark:bg-[#0f1115] p-8 flex flex-col justify-center animate-in fade-in">
           <div className="max-w-md mx-auto w-full">
             <h1 className="text-4xl font-black mb-4 italic tracking-tighter">BASELAYER SETUP</h1>
             <p className="text-slate-500 mb-8 font-medium">Select your primary skin or hair concerns to calibrate the AI.</p>
@@ -121,7 +121,7 @@ export default function BaseLayer() {
                 </button>
               ))}
             </div>
-            <button onClick={() => setShowSurvey(false)} className="w-full py-5 bg-blue-600 text-white rounded-[24px] font-black text-lg">COMPLETE PROFILE</button>
+            <button onClick={() => setShowSurvey(false)} className="w-full py-5 bg-blue-600 text-white rounded-3xl font-black text-lg">COMPLETE PROFILE</button>
           </div>
         </div>
       )}
@@ -139,7 +139,7 @@ export default function BaseLayer() {
 
             {!isManualMode ? (
               <div className="relative mb-8">
-                <input type="text" placeholder="Search brand or product..." className="w-full p-6 pl-8 rounded-[32px] bg-white dark:bg-[#1a1d23] shadow-2xl border-none outline-none focus:ring-2 focus:ring-blue-600/20 text-lg" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAnalyze(false)} />
+                <input type="text" placeholder="Search brand or product..." className="w-full p-6 pl-8 rounded-4xl bg-white dark:bg-[#1a1d23] shadow-2xl border-none outline-none focus:ring-2 focus:ring-blue-600/20 text-lg" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAnalyze(false)} />
                 <button onClick={() => handleAnalyze(false)} className="absolute right-3 top-1/2 -translate-y-1/2 p-4 bg-blue-600 rounded-full text-white">{isLoading ? <Loader2 className="animate-spin" /> : <Search size={24} />}</button>
               </div>
             ) : (
@@ -151,7 +151,7 @@ export default function BaseLayer() {
                 <div className="flex gap-2 mb-6">
                   <button onClick={() => ocrInputRef.current?.click()} className="flex-1 py-3 bg-slate-100 dark:bg-white/5 rounded-xl font-bold text-xs flex items-center justify-center gap-2"><Camera size={16}/> {ocrStatus || "Scan Label"}</button>
                 </div>
-                <button onClick={() => handleAnalyze(true)} className="w-full py-5 bg-blue-600 text-white rounded-[24px] font-bold">SAVE & ANALYZE</button>
+                <button onClick={() => handleAnalyze(true)} className="w-full py-5 bg-blue-600 text-white rounded-3xl font-bold">SAVE & ANALYZE</button>
               </div>
             )}
 
@@ -177,7 +177,7 @@ export default function BaseLayer() {
             <h2 className="text-3xl font-black mb-8 italic">ROUTINES</h2>
             <div className="grid gap-4">
               {[{ name: "Morning Face", icon: <Coffee />, color: "text-orange-400" }, { name: "Night Face", icon: <Sunset />, color: "text-indigo-400" }, { name: "Hair Routine", icon: <Wind />, color: "text-blue-400" }, { name: "Body Care", icon: <Bath />, color: "text-emerald-400" }].map(r => (
-                <div key={r.name} className="bg-white dark:bg-[#1a1d23] p-6 rounded-[32px] flex items-center justify-between border border-slate-200 dark:border-white/5 shadow-sm">
+                <div key={r.name} className="bg-white dark:bg-[#1a1d23] p-6 rounded-4xl flex items-center justify-between border border-slate-200 dark:border-white/5 shadow-sm">
                   <div className="flex items-center gap-4"><div className={`p-3 bg-slate-50 dark:bg-white/5 rounded-2xl ${r.color}`}>{r.icon}</div><p className="font-bold">{r.name}</p></div>
                   <Plus className="text-slate-300" />
                 </div>
@@ -190,14 +190,14 @@ export default function BaseLayer() {
         {activeTab === 'settings' && (
           <div className="animate-in slide-in-from-right-4">
             <h2 className="text-3xl font-black mb-8 italic uppercase">Settings</h2>
-            <div className="bg-white dark:bg-[#1a1d23] p-6 rounded-[32px] mb-6 shadow-sm border border-slate-200 dark:border-white/5">
+            <div className="bg-white dark:bg-[#1a1d23] p-6 rounded-4xl mb-6 shadow-sm border border-slate-200 dark:border-white/5">
               <p className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Appearance</p>
               <div className="flex gap-2">
                 <button onClick={() => setIsDarkMode(false)} className={`flex-1 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 border-2 transition-all ${!isDarkMode ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-transparent bg-slate-50 dark:bg-white/5 text-slate-500'}`}><Sun size={18}/> Light</button>
                 <button onClick={() => setIsDarkMode(true)} className={`flex-1 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 border-2 transition-all ${isDarkMode ? 'border-blue-600 bg-blue-500/10 text-blue-400' : 'border-transparent bg-slate-50 dark:bg-white/5 text-slate-500'}`}><Moon size={18}/> Dark</button>
               </div>
             </div>
-            <div className="bg-white dark:bg-[#1a1d23] p-6 rounded-[32px] border border-slate-200 dark:border-white/5 shadow-sm">
+            <div className="bg-white dark:bg-[#1a1d23] p-6 rounded-4xl border border-slate-200 dark:border-white/5 shadow-sm">
               <p className="text-[10px] font-black text-slate-400 uppercase mb-6 tracking-widest">Personal Profile</p>
               <div className="space-y-8">
                 {PROFILE_ATTRIBUTES.map(group => (

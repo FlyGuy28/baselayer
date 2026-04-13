@@ -69,6 +69,15 @@ export async function POST(req: Request) {
 
   score = score - (warnings.length * 15) + (heroes.length * 10);
 
+  // Add the updated scoring logic
+  if (score < 60) {
+    score = 0;
+  } else if (score > 80) {
+    score = 100;
+  } else {
+    score = score - (warnings.length * 5);
+  }
+
   return Response.json({
     status: 'success',
     product: finalProductName,
